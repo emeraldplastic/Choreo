@@ -1,0 +1,22 @@
+{
+  "name": "choreo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Real-time collaborative code editor & isolated execution engine",
+  "scripts": {
+    "dev:client": "npm -w client run dev",
+    "dev:server": "npm -w server run dev",
+    "build": "npm -w client run build",
+    "lint": "npm -w client run lint",
+    "test": "echo \"No tests yet\""
+  },
+  "workspaces": [
+    "client",
+    "server",
+    "runner"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

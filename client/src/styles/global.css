@@ -1,0 +1,161 @@
+/* ── Reset & Base ─────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  background: #0d1117;
+  color: #e6edf3;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+}
+
+/* ── App Layout ──────────────────────────────────────────── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 48px;
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  flex-shrink: 0;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.tagline {
+  font-size: 12px;
+  color: #8b949e;
+  font-style: italic;
+}
+
+.lang-select {
+  background: #21262d;
+  color: #e6edf3;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+
+.lang-select:hover {
+  border-color: #58a6ff;
+}
+
+.run-btn {
+  background: #238636;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.run-btn:hover {
+  background: #2ea043;
+}
+
+.run-btn:active {
+  background: #1a7f37;
+}
+
+/* ── Workspace ───────────────────────────────────────────── */
+.workspace {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Editor ──────────────────────────────────────────────── */
+.editor-container {
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── Output Panel ────────────────────────────────────────── */
+.output-panel {
+  height: 200px;
+  min-height: 120px;
+  background: #0d1117;
+  border-top: 1px solid #30363d;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px;
+  background: #161b22;
+  border-bottom: 1px solid #21262d;
+  font-size: 12px;
+}
+
+.output-title {
+  font-weight: 600;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.output-count {
+  color: #58a6ff;
+  font-size: 11px;
+}
+
+.output-content {
+  flex: 1;
+  overflow: auto;
+  padding: 10px 16px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.output-placeholder {
+  color: #484f58;
+  font-style: italic;
+}
+
+.output-line {
+  color: #e6edf3;
+}
+
+.output-error {
+  color: #f85149;
+}
