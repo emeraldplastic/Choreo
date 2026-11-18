@@ -1,24 +1,18 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Editor } from './components/Editor';
 import { OutputPanel } from './components/OutputPanel';
 import { Header } from './components/Header';
-
-const DEFAULT_CODE = `// Welcome to Choreo 🎭
-// Start typing — your collaborators will see every keystroke in real time.
-
-function fibonacci(n) {
-  if (n <= 1) return n;
-  return fibonacci(n - 1) + fibonacci(n - 2);
-}
-
-console.log('fib(10) =', fibonacci(10));
-console.log('Hello from Choreo!');
-`;
+import { useCollaboration } from './hooks/useCollaboration';
 
 export function App() {
-  const [code, setCode] = useState(DEFAULT_CODE);
+  const [code, setCode] = useState('');
   const [output, setOutput] = useState<string[]>([]);
   const [language, setLanguage] = useState<'javascript' | 'python'>('javascript');
+  const { ydoc, provider, peers, connected, roomId } = useCollaboration();
+
+  const handleDocChange = useCallback((value: string) => {
+    setCode(value);
+  }, []);
 
   const handleRun = () => {
     // Phase 1: local eval for JS only (will be replaced by Docker runner in PR #5-7)
@@ -29,8 +23,14 @@ export function App() {
       error: (...args: unknown[]) => logs.push(`[ERR] ${args.map(String).join(' ')}`),
       warn: (...args: unknown[]) => logs.push(`[WARN] ${args.map(String).join(' ')}`),
     };
+
+    // Read latest content from the shared Y.Doc
+    const currentCode = ydoc.current
+      ? ydoc.current.getText('codemirror').toString()
+      : code;
+
     try {
-      const fn = new Function('console', code);
+      const fn = new Function('console', currentCode);
       fn(fakeConsole);
       setOutput(logs.length ? logs : ['(no output)']);
     } catch (err) {
@@ -40,9 +40,21 @@ export function App() {
 
   return (
     <div className="app">
-      <Header language={language} onLanguageChange={setLanguage} onRun={handleRun} />
+      <Header
+        language={language}
+        onLanguageChange={setLanguage}
+        onRun={handleRun}
+        connected={connected}
+        peers={peers}
+        roomId={roomId}
+      />
       <main className="workspace">
-        <Editor code={code} onChange={setCode} language={language} />
+        <Editor
+          language={language}
+          ydoc={ydoc}
+          provider={provider}
+          onDocChange={handleDocChange}
+        />
         <OutputPanel lines={output} />
       </main>
     </div>

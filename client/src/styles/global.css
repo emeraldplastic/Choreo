@@ -41,6 +41,12 @@ html, body, #root {
   gap: 10px;
 }
 
+.header-center {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .logo {
   font-size: 18px;
   font-weight: 700;
@@ -53,6 +59,46 @@ html, body, #root {
   font-style: italic;
 }
 
+/* ── Connection & Peers ──────────────────────────────────── */
+.connection-badge {
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.3px;
+}
+
+.connection-badge.connected {
+  background: #238636aa;
+  color: #7ee787;
+}
+
+.connection-badge.disconnected {
+  background: #da363666;
+  color: #ff7b72;
+}
+
+.peer-avatars {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.peer-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid #0d1117;
+}
+
+.peer-count {
+  font-size: 11px;
+  color: #8b949e;
+  margin-left: 4px;
+}
+
+/* ── Controls ────────────────────────────────────────────── */
 .lang-select {
   background: #21262d;
   color: #e6edf3;
