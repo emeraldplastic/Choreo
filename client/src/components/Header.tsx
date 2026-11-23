@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import type { Peer } from '../hooks/useCollaboration';
+import { PeerList } from './PeerList';
 
 interface HeaderProps {
   language: 'javascript' | 'python';
@@ -7,34 +9,49 @@ interface HeaderProps {
   connected: boolean;
   peers: Peer[];
   roomId: string;
+  userName: string;
+  userColor: string;
+  onUpdateUserName: (name: string) => void;
+  onUpdateUserColor: (color: string) => void;
 }
 
-export function Header({ language, onLanguageChange, onRun, connected, peers, roomId }: HeaderProps) {
+export function Header({
+  language,
+  onLanguageChange,
+  onRun,
+  connected,
+  peers,
+  roomId,
+  userName,
+  userColor,
+  onUpdateUserName,
+  onUpdateUserColor,
+}: HeaderProps) {
+  const [copied, setCopied] = useState(false);
+
+  const handleQuickShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <header className="header">
       <div className="header-left">
-        <h1 className="logo">\u{1F3AD} Choreo</h1>
+        <h1 className="logo">🎭 Choreo</h1>
         <span className="tagline">collaborative code</span>
       </div>
 
       <div className="header-center">
-        <span className={`connection-badge ${connected ? 'connected' : 'disconnected'}`}>
-          {connected ? '\u{1F7E2}' : '\u{1F534}'} {roomId}
-        </span>
-
-        <div className="peer-avatars">
-          {peers.map((peer) => (
-            <span
-              key={peer.clientId}
-              className="peer-dot"
-              style={{ backgroundColor: peer.color }}
-              title={peer.name}
-            />
-          ))}
-          <span className="peer-count">
-            {peers.length} {peers.length === 1 ? 'user' : 'users'}
-          </span>
-        </div>
+        <PeerList
+          peers={peers}
+          connected={connected}
+          roomId={roomId}
+          userName={userName}
+          userColor={userColor}
+          onUpdateUserName={onUpdateUserName}
+          onUpdateUserColor={onUpdateUserColor}
+        />
 
         <select
           className="lang-select"
@@ -47,8 +64,16 @@ export function Header({ language, onLanguageChange, onRun, connected, peers, ro
       </div>
 
       <div className="header-right">
-        <button className="run-btn" onClick={onRun}>
-          \u25b6 Run
+        <button
+          type="button"
+          className={`share-btn ${copied ? 'copied' : ''}`}
+          onClick={handleQuickShare}
+          title="Copy room invite link"
+        >
+          {copied ? '✓ Copied' : '🔗 Share'}
+        </button>
+        <button type="button" className="run-btn" onClick={onRun}>
+          ▶ Run
         </button>
       </div>
     </header>

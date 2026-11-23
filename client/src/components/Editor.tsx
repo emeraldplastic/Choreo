@@ -17,10 +17,11 @@ interface EditorProps {
   ydoc: React.RefObject<Y.Doc | null>;
   provider: React.RefObject<WebsocketProvider | null>;
   onDocChange?: (value: string) => void;
+  onTyping?: (isTyping: boolean) => void;
 }
 
-const DEFAULT_CODE = `// Welcome to Choreo \u{1F3AD}
-// Start typing \u2014 your collaborators will see every keystroke in real time.
+const DEFAULT_CODE = `// Welcome to Choreo 🎭
+// Start typing — your collaborators will see every keystroke and cursor in real time.
 
 function fibonacci(n) {
   if (n <= 1) return n;
@@ -31,11 +32,14 @@ console.log('fib(10) =', fibonacci(10));
 console.log('Hello from Choreo!');
 `;
 
-export function Editor({ language, ydoc, provider, onDocChange }: EditorProps) {
+export function Editor({ language, ydoc, provider, onDocChange, onTyping }: EditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const onDocChangeRef = useRef(onDocChange);
   onDocChangeRef.current = onDocChange;
+  const onTypingRef = useRef(onTyping);
+  onTypingRef.current = onTyping;
+  const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!containerRef.current || !ydoc.current || !provider.current) return;
@@ -66,7 +70,7 @@ export function Editor({ language, ydoc, provider, onDocChange }: EditorProps) {
         lintGutter(),
         langExtension,
         vscodeDark,
-        // ---- Yjs collaborative binding ----
+        // ---- Yjs collaborative binding & awareness cursors ----
         yCollab(ytext, prov.awareness),
         keymap.of([
           ...defaultKeymap,
@@ -75,8 +79,19 @@ export function Editor({ language, ydoc, provider, onDocChange }: EditorProps) {
           indentWithTab,
         ]),
         EditorView.updateListener.of((update) => {
-          if (update.docChanged && onDocChangeRef.current) {
-            onDocChangeRef.current(update.state.doc.toString());
+          if (update.docChanged) {
+            if (onDocChangeRef.current) {
+              onDocChangeRef.current(update.state.doc.toString());
+            }
+            if (onTypingRef.current) {
+              onTypingRef.current(true);
+              if (typingTimerRef.current) {
+                clearTimeout(typingTimerRef.current);
+              }
+              typingTimerRef.current = setTimeout(() => {
+                onTypingRef.current?.(false);
+              }, 1200);
+            }
           }
         }),
         EditorView.theme({
@@ -84,13 +99,44 @@ export function Editor({ language, ydoc, provider, onDocChange }: EditorProps) {
           '.cm-scroller': { overflow: 'auto' },
           '.cm-content': { fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace" },
           '.cm-gutters': { borderRight: '1px solid #333' },
-          // Style for remote peer cursors injected by yCollab
+          // ---- Remote peer cursor & selection styling ----
+          '.cm-ySelection': {
+            borderRadius: '2px',
+            transition: 'background-color 0.15s ease',
+          },
+          '.cm-ySelectionCaret': {
+            position: 'relative',
+            borderLeft: '2px solid',
+            marginLeft: '-1px',
+            marginRight: '-1px',
+            boxSizing: 'border-box',
+            display: 'inline',
+          },
+          '.cm-ySelectionCaretDot': {
+            borderRadius: '50%',
+            position: 'absolute',
+            width: '6px',
+            height: '6px',
+            top: '-3px',
+            left: '-2px',
+          },
           '.cm-ySelectionInfo': {
-            fontSize: '11px',
-            fontFamily: 'sans-serif',
-            padding: '1px 4px',
+            position: 'absolute',
+            top: '-1.4em',
+            left: '-1px',
+            fontSize: '10px',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            fontWeight: '600',
+            lineHeight: '1.2',
+            padding: '1px 5px',
             borderRadius: '3px',
-            opacity: '0.9',
+            color: '#ffffff',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.4)',
+            whiteSpace: 'nowrap',
+            userSelect: 'none',
+            pointerEvents: 'none',
+            zIndex: '100',
+            transition: 'opacity 0.2s ease, transform 0.2s ease',
           },
         }),
       ],
@@ -104,6 +150,9 @@ export function Editor({ language, ydoc, provider, onDocChange }: EditorProps) {
     viewRef.current = view;
 
     return () => {
+      if (typingTimerRef.current) {
+        clearTimeout(typingTimerRef.current);
+      }
       view.destroy();
       viewRef.current = null;
     };

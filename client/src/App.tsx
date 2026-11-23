@@ -8,7 +8,18 @@ export function App() {
   const [code, setCode] = useState('');
   const [output, setOutput] = useState<string[]>([]);
   const [language, setLanguage] = useState<'javascript' | 'python'>('javascript');
-  const { ydoc, provider, peers, connected, roomId } = useCollaboration();
+  const {
+    ydoc,
+    provider,
+    peers,
+    connected,
+    roomId,
+    userName,
+    userColor,
+    updateUserName,
+    updateUserColor,
+    setLocalTyping,
+  } = useCollaboration();
 
   const handleDocChange = useCallback((value: string) => {
     setCode(value);
@@ -47,6 +58,10 @@ export function App() {
         connected={connected}
         peers={peers}
         roomId={roomId}
+        userName={userName}
+        userColor={userColor}
+        onUpdateUserName={updateUserName}
+        onUpdateUserColor={updateUserColor}
       />
       <main className="workspace">
         <Editor
@@ -54,6 +69,7 @@ export function App() {
           ydoc={ydoc}
           provider={provider}
           onDocChange={handleDocChange}
+          onTyping={setLocalTyping}
         />
         <OutputPanel lines={output} />
       </main>
